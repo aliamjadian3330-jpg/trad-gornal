@@ -4,751 +4,572 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>دفتر معاملات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
-  :root {
-    --paper: #f1ead9;
-    --paper2: #e9dfc8;
-    --card: #faf6ea;
-    --rule: #d2c4a4;
-    --rule-dark: #b9a87f;
-    --ink: #2b2620;
-    --ink-soft: #5c5340;
-    --ink-faint: #8c8268;
-    --red: #9c3530;
-    --red-soft: #c9504a;
-    --green: #2e6b4d;
-    --green-soft: #438064;
-    --seal: #a9742f;
-    --seal-dark: #7d5520;
-    --radius: 3px;
+  :root{
+    --ink:#1f2a24;
+    --paper:#f3efe2;
+    --card:#fffdf7;
+    --line:#dcd3b8;
+    --moss:#3c6e52;
+    --moss-dark:#2a4d3a;
+    --gold:#b8893f;
+    --rose:#a8453a;
+    --muted:#8b8270;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *{box-sizing:border-box;margin:0;padding:0;}
 
-  body {
-    font-family: 'Vazirmatn', Tahoma, sans-serif;
-    background: var(--paper);
-    background-image:
-      linear-gradient(var(--rule) 1px, transparent 1px);
-    background-size: 100% 38px;
-    color: var(--ink);
-    min-height: 100vh;
-    padding-bottom: 80px;
-  }
-  .mono { font-family: 'JetBrains Mono', monospace; }
-
-  /* ── TOP MARGIN BAND (ledger feel) ── */
-  .margin-rule {
-    position: fixed; top: 0; bottom: 0; right: 64px;
-    width: 1px; background: rgba(156,53,48,0.35);
-    pointer-events: none; z-index: 1;
-  }
-  @media (max-width: 700px) { .margin-rule { display: none; } }
-
-  /* ── HEADER / LEDGER TITLE BLOCK ── */
-  .ledger-head {
-    max-width: 760px; margin: 0 auto; padding: 46px 28px 30px;
-    position: relative; z-index: 2;
-  }
-  .seal {
-    width: 86px; height: 86px; border: 2.5px solid var(--seal);
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    flex-direction: column; margin: 0 auto 22px; transform: rotate(-6deg);
-    color: var(--seal-dark); position: relative;
-  }
-  .seal::before {
-    content: ''; position: absolute; inset: 6px; border: 1px dashed var(--seal);
-    border-radius: 50%; opacity: .55;
-  }
-  .seal-top { font-size: 10px; letter-spacing: 2px; font-weight: 700; }
-  .seal-mid { font-size: 22px; }
-  .seal-bot { font-size: 9px; letter-spacing: 1px; }
-
-  .ledger-head h1 {
-    text-align: center; font-size: 27px; font-weight: 800;
-    color: var(--ink); margin-bottom: 8px; letter-spacing: 0.3px;
-  }
-  .ledger-head .sub {
-    text-align: center; font-size: 13.5px; color: var(--ink-soft);
-    max-width: 460px; margin: 0 auto 24px; line-height: 1.9;
+  body{
+    font-family:'Vazirmatn',Tahoma,sans-serif;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(60,110,82,.07), transparent 45%),
+      radial-gradient(circle at 100% 100%, rgba(184,137,63,.08), transparent 45%),
+      var(--paper);
+    color:var(--ink);
+    padding:32px 16px;
+    line-height:1.8;
+    min-height:100vh;
   }
 
-  .meta-strip {
-    display: flex; justify-content: center; gap: 0; flex-wrap: wrap;
-    border-top: 1px solid var(--rule-dark); border-bottom: 1px solid var(--rule-dark);
-    padding: 12px 0;
-  }
-  .meta-item {
-    padding: 0 18px; text-align: center; border-left: 1px solid var(--rule);
-  }
-  .meta-item:last-child { border-left: none; }
-  .meta-num { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: var(--seal-dark); }
-  .meta-lab { font-size: 10.5px; color: var(--ink-faint); margin-top: 2px; }
-
-  /* ── MAIN ── */
-  .main { max-width: 760px; margin: 0 auto; padding: 8px 28px 0; position: relative; z-index: 2; }
-
-  /* ── LEDGER ENTRY (section) ── */
-  .entry { margin-bottom: 36px; }
-  .entry-head {
-    display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px;
-  }
-  .entry-no {
-    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;
-    color: var(--card); background: var(--ink); border-radius: 50%;
-    width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .entry-title { font-size: 16.5px; font-weight: 800; color: var(--ink); }
-  .entry-desc { font-size: 12px; color: var(--ink-faint); margin: 2px 0 16px 40px; }
-  .entry-body {
-    background: var(--card); border: 1px solid var(--rule-dark);
-    border-radius: var(--radius); padding: 22px;
-    box-shadow: 2px 3px 0 rgba(43,38,32,0.06);
+  .container{
+    max-width:680px;
+    margin:auto;
   }
 
-  /* ── GRID ── */
-  .row { display: grid; gap: 16px; margin-bottom: 16px; }
-  .row:last-child { margin-bottom: 0; }
-  .row-2 { grid-template-columns: 1fr 1fr; }
-  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
-
-  /* ── FIELDS ── */
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label {
-    font-size: 12px; font-weight: 700; color: var(--ink-soft);
-    display: flex; align-items: center; gap: 5px;
-  }
-  .field label .req { color: var(--red); }
-
-  input[type=text], input[type=number], input[type=date], input[type=time], select, textarea {
-    width: 100%; padding: 10px 12px;
-    background: var(--paper); border: none;
-    border-bottom: 1.5px solid var(--rule-dark);
-    border-radius: 0;
-    color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
-    outline: none; transition: border-color .15s, background .15s;
-  }
-  select { font-family: 'Vazirmatn', sans-serif; font-size: 13.5px; }
-  textarea { font-family: 'Vazirmatn', sans-serif; font-size: 13.5px; line-height: 1.8; resize: vertical; min-height: 84px; }
-  input:focus, select:focus, textarea:focus {
-    border-bottom-color: var(--red); background: #fffefa;
-  }
-  input::placeholder, textarea::placeholder { color: var(--ink-faint); }
-  select option { background: var(--card); font-family: 'Vazirmatn', sans-serif; }
-
-  /* ── RADIO (ticket stub style) ── */
-  .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
-  .radio-btn { position: relative; }
-  .radio-btn input { position: absolute; opacity: 0; width: 0; height: 0; }
-  .radio-btn label {
-    display: flex; align-items: center; gap: 7px;
-    padding: 9px 18px; border: 1.5px solid var(--rule-dark);
-    cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-soft);
-    transition: all .15s; background: var(--paper);
-  }
-  .radio-btn input:checked + label {
-    border-color: var(--ink); color: var(--ink); background: var(--card);
-    box-shadow: 1.5px 2px 0 var(--ink);
-  }
-  .radio-buy input:checked + label { border-color: var(--green); color: var(--green); box-shadow: 1.5px 2px 0 var(--green); }
-  .radio-sell input:checked + label { border-color: var(--red); color: var(--red); box-shadow: 1.5px 2px 0 var(--red); }
-
-  /* ── CHECKLIST (ledger tick rows) ── */
-  .checklist { display: flex; flex-direction: column; }
-  .check-item { position: relative; border-bottom: 1px dotted var(--rule-dark); }
-  .check-item:last-child { border-bottom: none; }
-  .check-item input[type=checkbox] { position: absolute; opacity: 0; width: 0; height: 0; }
-  .check-item label {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 12px 4px; cursor: pointer;
-    font-size: 13px; color: var(--ink-soft); line-height: 1.7;
-    transition: color .15s;
-  }
-  .check-item label .box {
-    width: 19px; height: 19px; border: 1.5px solid var(--ink-soft);
-    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-    margin-top: 2px; transition: all .15s; background: var(--paper);
-  }
-  .check-item label .box svg { display: none; }
-  .check-item input:checked + label { color: var(--ink); }
-  .check-item input:checked + label .box {
-    background: var(--green); border-color: var(--green);
-  }
-  .check-item input:checked + label .box svg { display: block; }
-  .check-counter {
-    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-faint);
-    text-align: left; margin-top: 10px; font-weight: 600;
-  }
-  .check-counter span { color: var(--green); }
-
-  /* ── EMOTION ROW (stamp chips) ── */
-  .emotion-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
-  .emotion-btn { position: relative; }
-  .emotion-btn input { position: absolute; opacity: 0; width: 0; height: 0; }
-  .emotion-btn label {
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    padding: 11px 4px; border: 1.5px dashed var(--rule-dark);
-    cursor: pointer; font-size: 11px; color: var(--ink-faint); text-align: center;
-    transition: all .15s; background: var(--paper);
-  }
-  .emotion-btn label .emo { font-size: 19px; }
-  .emotion-btn input:checked + label {
-    border: 1.5px solid var(--seal-dark); color: var(--seal-dark); background: #fbf0db;
+  .ledger-header{
+    text-align:center;
+    margin-bottom:28px;
   }
 
-  /* ── RANGE ── */
-  .range-wrap { display: flex; flex-direction: column; gap: 8px; }
-  .range-labels { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--ink-faint); }
-  input[type=range] {
-    -webkit-appearance: none; width: 100%; height: 2px;
-    background: var(--rule-dark); outline: none; border: none; padding: 0; box-shadow: none;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 16px; height: 16px;
-    border-radius: 50%; background: var(--red); cursor: pointer;
-    border: 2.5px solid var(--paper); box-shadow: 0 0 0 1.5px var(--red);
-  }
-  .range-val { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 19px; font-weight: 700; color: var(--seal-dark); }
-
-  /* ── UPLOAD ── */
-  .upload-zone {
-    border: 1.5px dashed var(--rule-dark); padding: 30px 18px; text-align: center;
-    cursor: pointer; transition: all .15s; background: var(--paper); position: relative;
-  }
-  .upload-zone:hover { border-color: var(--ink); background: #fbf0db; }
-  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .upload-icon { font-size: 30px; margin-bottom: 10px; }
-  .upload-title { font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
-  .upload-sub { font-size: 11px; color: var(--ink-faint); }
-  #upload-preview { margin-top: 14px; display: none; }
-  #upload-preview img { max-width: 100%; border: 1px solid var(--rule-dark); }
-  #file-name { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); margin-top: 8px; }
-
-  .divider {
-    display: flex; align-items: center; gap: 10px; margin: 22px 0 14px;
-    color: var(--ink-faint); font-size: 10.5px; font-weight: 700; letter-spacing: 0.5px;
-  }
-  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--rule-dark); }
-
-  .info-note {
-    font-size: 11px; color: var(--ink-faint); background: var(--paper2);
-    border-right: 2px solid var(--seal); padding: 8px 12px; margin-bottom: 16px;
+  .ledger-header .mark{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:54px;height:54px;
+    border-radius:50%;
+    background:var(--moss-dark);
+    color:#f3efe2;
+    font-size:24px;
+    margin-bottom:14px;
+    box-shadow:0 6px 16px rgba(42,77,58,.25);
   }
 
-  /* ── SUBMIT ── */
-  .submit-wrap { padding: 10px 0 0; }
-  .btn-submit {
-    width: 100%; padding: 16px;
-    background: var(--ink); color: var(--card); border: none;
-    font-family: 'Vazirmatn', sans-serif; font-size: 15.5px; font-weight: 800;
-    cursor: pointer; letter-spacing: 0.3px;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    transition: all .15s;
-  }
-  .btn-submit:hover { background: var(--red); }
-  .btn-submit:active { transform: translateY(1px); }
-
-  /* ── SUCCESS (stamped) ── */
-  #success-msg { display: none; text-align: center; padding: 60px 24px; }
-  #success-msg .stamp {
-    display: inline-block; border: 3px solid var(--green); color: var(--green);
-    padding: 14px 30px; transform: rotate(-7deg); font-weight: 900; font-size: 22px;
-    letter-spacing: 2px; margin-bottom: 22px; border-radius: 6px;
-  }
-  #success-msg p { color: var(--ink-soft); font-size: 13.5px; line-height: 1.9; max-width: 380px; margin: 0 auto; }
-
-  .foot-note {
-    text-align: center; font-size: 10.5px; color: var(--ink-faint);
-    padding: 30px 0 0; font-family: 'JetBrains Mono', monospace;
+  h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-.3px;
   }
 
-  @media (max-width: 600px) {
-    .row-2, .row-3 { grid-template-columns: 1fr; }
-    .emotion-grid { grid-template-columns: repeat(4,1fr); }
-    .ledger-head h1 { font-size: 21px; }
-    .main, .ledger-head { padding-left: 16px; padding-right: 16px; }
-    .entry-body { padding: 16px; }
-    .entry-desc { margin-right: 0; }
+  .subtitle{
+    color:var(--muted);
+    margin-top:6px;
+    font-size:14px;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 10px 30px rgba(43,38,32,.05);
+  }
+
+  .section-label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--moss-dark);
+    letter-spacing:.3px;
+    margin:30px 0 16px;
+  }
+
+  .section-label:first-child{margin-top:0;}
+
+  .section-label::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:linear-gradient(to left, var(--line), transparent);
+  }
+
+  .field{margin-bottom:16px;}
+
+  .row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+
+  label{
+    display:block;
+    margin-bottom:7px;
+    font-weight:600;
+    font-size:13.5px;
+    color:#46453c;
+  }
+
+  label .opt{
+    font-weight:400;
+    color:var(--muted);
+    font-size:12px;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  input[type="url"],
+  select,
+  textarea{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fffefb;
+    color:var(--ink);
+    transition:border-color .15s, box-shadow .15s;
+  }
+
+  input:focus, textarea:focus, select:focus{
+    outline:none;
+    border-color:var(--moss);
+    box-shadow:0 0 0 3px rgba(60,110,82,.12);
+  }
+
+  input::placeholder, textarea::placeholder{color:#b5ad99;}
+
+  textarea{min-height:110px;resize:vertical;}
+
+  .radio-group{
+    display:flex;
+    gap:10px;
+  }
+
+  .radio-pill{
+    flex:1;
+    position:relative;
+  }
+
+  .radio-pill input{
+    position:absolute;
+    opacity:0;
+    inset:0;
+    cursor:pointer;
+  }
+
+  .radio-pill span{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-weight:600;
+    font-size:14px;
+    color:var(--muted);
+    background:#fffefb;
+    transition:all .15s;
+  }
+
+  .radio-pill input:checked + span{
+    border-color:var(--moss);
+    color:#fff;
+    background:var(--moss);
+    box-shadow:0 4px 12px rgba(60,110,82,.25);
+  }
+
+  .radio-pill:nth-child(2) input:checked + span{
+    background:var(--rose);
+    border-color:var(--rose);
+    box-shadow:0 4px 12px rgba(168,69,58,.25);
+  }
+
+  /* Link box - the new section */
+  .link-box{
+    background:linear-gradient(160deg, #fbf8ee, #f5efdc);
+    border:1px dashed var(--gold);
+    border-radius:12px;
+    padding:18px 16px;
+  }
+
+  .link-box .link-row{
+    display:flex;
+    gap:10px;
+  }
+
+  .link-box input[type="url"]{
+    flex:1;
+  }
+
+  .link-box .link-hint{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:8px;
+  }
+
+  .chip-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+  }
+
+  .chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:6px 12px;
+    font-size:12.5px;
+    font-family:'JetBrains Mono', monospace;
+    color:var(--moss-dark);
+    direction:ltr;
+  }
+
+  .chip button{
+    all:unset;
+    cursor:pointer;
+    color:var(--rose);
+    font-weight:700;
+    line-height:1;
+  }
+
+  .file-drop{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    background:#fffefb;
+    cursor:pointer;
+  }
+
+  .file-drop input{display:none;}
+
+  .file-drop-label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--muted);
+    font-size:13.5px;
+  }
+
+  .status{
+    margin-top:8px;
+    font-size:13px;
+    color:var(--moss-dark);
+    font-weight:600;
+  }
+
+  .preview{
+    display:none;
+    margin-top:14px;
+  }
+
+  .preview img{
+    max-width:100%;
+    border-radius:10px;
+    border:1px solid var(--line);
+  }
+
+  button.submit{
+    width:100%;
+    padding:15px;
+    margin-top:26px;
+    background:var(--moss-dark);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:700;
+    font-family:inherit;
+    letter-spacing:.2px;
+    transition:transform .12s, box-shadow .12s;
+    box-shadow:0 8px 20px rgba(42,77,58,.25);
+  }
+
+  button.submit:hover{transform:translateY(-1px);}
+  button.submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+  .success, .error{
+    display:none;
+    margin-top:18px;
+    padding:14px 16px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:600;
+  }
+
+  .success{background:#e1f3e7;color:#1f6b3f;border:1px solid #b9e2c6;}
+  .error{background:#fbe4e2;color:#a3392c;border:1px solid #f3c2bd;}
+
+  @media (max-width:480px){
+    .row{grid-template-columns:1fr;}
+    .card{padding:20px;}
   }
 </style>
 </head>
 <body>
 
-<div class="margin-rule"></div>
+<div class="container">
 
-<div class="ledger-head">
-  <div class="seal">
-    <div class="seal-top">ثبت</div>
-    <div class="seal-mid">📒</div>
-    <div class="seal-bot">شخصی</div>
+  <div class="ledger-header">
+    <div class="mark">📒</div>
+    <h1>دفتر معاملات</h1>
+    <p class="subtitle">ثبت معامله، آپلود چارت و ارسال لینک</p>
   </div>
-  <h1>دفتر معاملات</h1>
-  <p class="sub">هر معامله یک سطر در دفتر توست. عدد، دلیل، احساس — هرسه را ثبت کن تا الگوی ذهنت را ببینی، نه فقط سود و ضررت را.</p>
-  <div class="meta-strip">
-    <div class="meta-item"><div class="meta-num">۵</div><div class="meta-lab">بخش ثبت</div></div>
-    <div class="meta-item"><div class="meta-num">۸</div><div class="meta-lab">قانون ورود</div></div>
-    <div class="meta-item"><div class="meta-num">۱۰۰٪</div><div class="meta-lab">به ایمیلت</div></div>
-  </div>
-</div>
 
-<div class="main">
+  <div class="card">
+    <form id="tradeForm">
 
-<form id="journal-form" action="https://formspree.io/f/mqeovdwz" method="POST" enctype="multipart/form-data">
+      <div class="section-label">اطلاعات معامله</div>
 
-  <!-- ───── ۱ ───── -->
-  <div class="entry">
-    <div class="entry-head">
-      <div class="entry-no mono">۱</div>
-      <div class="entry-title">اطلاعات پایه معامله</div>
-    </div>
-    <div class="entry-desc">ورود، خروج، نماد و اعداد اصلی</div>
-    <div class="entry-body">
-
-      <div class="row row-2">
+      <div class="row">
         <div class="field">
-          <label>تاریخ معامله <span class="req">*</span></label>
-          <input type="text" name="تاریخ معامله" placeholder="۱۴۰۴/۰۳/۲۷" required>
+          <label>تاریخ معامله *</label>
+          <input type="date" name="تاریخ معامله" required>
         </div>
         <div class="field">
-          <label>ساعت ورود <span class="req">*</span></label>
-          <input type="time" name="ساعت ورود" required>
-        </div>
-      </div>
-
-      <div class="row row-3">
-        <div class="field">
-          <label>نماد / جفت ارز <span class="req">*</span></label>
+          <label>نماد *</label>
           <input type="text" name="نماد" placeholder="BTCUSDT" required>
         </div>
-        <div class="field">
-          <label>صرافی / بروکر</label>
-          <input type="text" name="صرافی" placeholder="Binance / XM">
-        </div>
-        <div class="field">
-          <label>تایم‌فریم اصلی</label>
-          <select name="تایم‌فریم">
-            <option value="">انتخاب کنید</option>
-            <option>M1</option><option>M5</option><option>M15</option>
-            <option>M30</option><option>H1</option><option>H4</option>
-            <option>D1</option><option>W1</option>
-          </select>
-        </div>
       </div>
 
-      <div class="field" style="margin-bottom:16px;">
-        <label>جهت معامله <span class="req">*</span></label>
+      <div class="field">
+        <label>جهت معامله *</label>
         <div class="radio-group">
-          <div class="radio-btn radio-buy">
-            <input type="radio" id="buy" name="جهت معامله" value="خرید (Buy / Long)" required>
-            <label for="buy">▲ خرید (Long)</label>
-          </div>
-          <div class="radio-btn radio-sell">
-            <input type="radio" id="sell" name="جهت معامله" value="فروش (Sell / Short)">
-            <label for="sell">▼ فروش (Short)</label>
-          </div>
+          <label class="radio-pill">
+            <input type="radio" name="جهت معامله" value="خرید" required>
+            <span>📈 خرید</span>
+          </label>
+          <label class="radio-pill">
+            <input type="radio" name="جهت معامله" value="فروش">
+            <span>📉 فروش</span>
+          </label>
         </div>
       </div>
 
-      <div class="row row-3">
+      <div class="row">
         <div class="field">
-          <label>نقطه ورود <span class="req">*</span></label>
-          <input type="text" name="نقطه ورود" placeholder="قیمت ورود" required>
+          <label>نقطه ورود *</label>
+          <input type="number" step="any" name="نقطه ورود" required>
         </div>
         <div class="field">
-          <label>حد ضرر (SL) <span class="req">*</span></label>
-          <input type="text" name="حد ضرر" placeholder="استاپ لاس" required>
-        </div>
-        <div class="field">
-          <label>حد سود (TP)</label>
-          <input type="text" name="حد سود" placeholder="تیک پرافیت">
-        </div>
-      </div>
-
-      <div class="row row-3">
-        <div class="field">
-          <label>حجم / لات</label>
-          <input type="text" name="حجم معامله" placeholder="0.1 lot">
-        </div>
-        <div class="field">
-          <label>نسبت R:R</label>
-          <input type="text" name="نسبت ریسک به ریوارد" placeholder="1:2">
-        </div>
-        <div class="field">
-          <label>اهرم (Leverage)</label>
-          <input type="text" name="اهرم" placeholder="1:10">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ───── ۲ ───── -->
-  <div class="entry">
-    <div class="entry-head">
-      <div class="entry-no mono">۲</div>
-      <div class="entry-title">مدیریت سرمایه و ریسک</div>
-    </div>
-    <div class="entry-desc">اعداد واقعی، نه حدس و گمان</div>
-    <div class="entry-body">
-
-      <div class="row row-3">
-        <div class="field">
-          <label>موجودی حساب ($)</label>
-          <input type="number" name="موجودی حساب" placeholder="1000">
-        </div>
-        <div class="field">
-          <label>درصد ریسک روی حساب</label>
-          <input type="number" name="درصد ریسک" placeholder="1" min="0" max="100" step="0.1">
-        </div>
-        <div class="field">
-          <label>مقدار ریسک به دلار ($)</label>
-          <input type="number" name="مقدار ریسک دلاری" placeholder="10">
-        </div>
-      </div>
-
-      <div class="row row-2">
-        <div class="field">
-          <label>نوع استراتژی</label>
-          <select name="نوع استراتژی">
-            <option value="">انتخاب کنید</option>
-            <option>اسکالپ (Scalp)</option>
-            <option>اینتراروز (Intraday)</option>
-            <option>سوئینگ (Swing)</option>
-            <option>پوزیشن (Position)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>ستاپ معاملاتی</label>
-          <select name="ستاپ معاملاتی">
-            <option value="">انتخاب کنید</option>
-            <option>بریک‌اوت</option>
-            <option>پول‌بک به حمایت/مقاومت</option>
-            <option>اوردربلاک</option>
-            <option>فیبوناچی</option>
-            <option>کندل برگشتی</option>
-            <option>شکست ساختار (BOS/ChoCH)</option>
-            <option>الگوی هارمونیک</option>
-            <option>سایر</option>
-          </select>
+          <label>حد ضرر *</label>
+          <input type="number" step="any" name="حد ضرر" required>
         </div>
       </div>
 
       <div class="field">
-        <label>توضیح مدیریت سرمایه در این معامله</label>
-        <textarea name="توضیح مدیریت سرمایه" placeholder="چرا این حجم را انتخاب کردی؟ آیا با قوانین مدیریت ریسکت همخوانی دارد؟"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- ───── ۳ ───── -->
-  <div class="entry">
-    <div class="entry-head">
-      <div class="entry-no mono">۳</div>
-      <div class="entry-title">چک‌لیست قوانین ورود</div>
-    </div>
-    <div class="entry-desc">پیش از ورود، همه شرایط را بررسی کن</div>
-    <div class="entry-body">
-      <div class="info-note">⚠ این چک‌لیست آینه قوانین ترید توست — صادق باش</div>
-      <div class="checklist" id="checklist">
-        <div class="check-item">
-          <input type="checkbox" id="c1" name="قانون ۱: روند مولتی‌تایم‌فریم" value="✓ تایید">
-          <label for="c1">
-            <span class="box"><svg width="11" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="#faf6ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            جهت روند در تایم‌فریم‌های بالاتر موافق است (مولتی‌تایم‌فریم آنالیز انجام شد)
-          </label>
-        </div>
-        <div class="check-item">
-          <input type="checkbox" id="c2" name="قانون ۲: ناحیه کلیدی" value="✓ تایید">
-          <label for="c2">
-            <span class="box"><svg width="11" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="#faf6ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            قیمت در یک ناحیه کلیدی قرار دارد (حمایت، مقاومت، اوردربلاک، FVG، قله/کف قبلی)
-          </label>
-        </div>
-        <div class="check-item">
-          <input type="checkbox" id="c3" name="قانون ۳: تاییدیه ورود" value="✓ تایید">
-          <label for="c3">
-            <span class="box"><svg width="11" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="#faf6ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            تاییدیه کندل‌استیک یا شکست ساختار در تایم‌فریم ورود مشاهده شد (BOS / Engulfing / Pin Bar)
-          </label>
-        </div>
-        <div class="check-item">
-          <input type="checkbox" id="c4" name="قانون ۴: نسبت ریسک به ریوارد" value="✓ تایید">
-          <label for="c4">
-            <span class="box"><svg width="11" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="#faf6ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            نسبت ریسک به ریوارد این معامله حداقل ۱ به ۲ است
-          </label>
-        </div>
-        <div class="check-item">
-          <input type="checkbox" id="c5" name="قانون ۵: رعایت مدیریت ریسک" value="✓ تایید">
-          <label for="c5">
-            <span class="box"><svg width="11" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="#faf6ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            ریسک این معامله از درصد مجاز حساب فراتر نمی‌رود (قانون ۱-۲٪ حساب)
-          </label>
-        </div>
-        <div class="check-item">
-          <input type="checkbox" id="c6" name="قانون ۶: نقدینگی و حجم" value="✓ تایید">
-          <label for="c6">
-            <span class="box"><svg width="11" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="#faf6ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            نقدینگی و حجم بازار در این ناحیه تایید می‌کند (volume / liquidity sweep)
-          </label>
-        </div>
-        <div class="check-item">
-          <input type="checkbox" id="c7" name="قانون ۷: عدم معامله در خلاف روند قوی" value="✓ تایید">
-          <label for="c7">
-            <span class="box"><svg width="11" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="#faf6ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            این معامله خلاف روند قوی اصلی نیست (counter-trend نمی‌زنم)
-          </label>
-        </div>
-        <div class="check-item">
-          <input type="checkbox" id="c8" name="قانون ۸: خبر مهم اقتصادی نیست" value="✓ تایید">
-          <label for="c8">
-            <span class="box"><svg width="11" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="#faf6ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            خبر اقتصادی مهمی در بازه زمانی نزدیک وجود ندارد
-          </label>
-        </div>
-      </div>
-      <div class="check-counter">قوانین تایید شده: <span id="check-count">۰</span> از ۸</div>
-    </div>
-  </div>
-
-  <!-- ───── ۴ ───── -->
-  <div class="entry">
-    <div class="entry-head">
-      <div class="entry-no mono">۴</div>
-      <div class="entry-title">تحلیل کیفی و ذهنی</div>
-    </div>
-    <div class="entry-desc">بخش اصلی رشدت — صادقانه بنویس</div>
-    <div class="entry-body">
-
-      <div class="field" style="margin-bottom:18px;">
-        <label>احساست قبل از ورود را انتخاب کن</label>
-        <div class="emotion-grid">
-          <div class="emotion-btn">
-            <input type="radio" id="em1" name="وضعیت احساسی" value="آرام و متمرکز">
-            <label for="em1"><span class="emo">😌</span>آرام</label>
-          </div>
-          <div class="emotion-btn">
-            <input type="radio" id="em2" name="وضعیت احساسی" value="طمع‌کار (FOMO)">
-            <label for="em2"><span class="emo">🤑</span>FOMO</label>
-          </div>
-          <div class="emotion-btn">
-            <input type="radio" id="em3" name="وضعیت احساسی" value="ترسیده">
-            <label for="em3"><span class="emo">😰</span>ترسیده</label>
-          </div>
-          <div class="emotion-btn">
-            <input type="radio" id="em4" name="وضعیت احساسی" value="انتقام‌جو (Revenge)">
-            <label for="em4"><span class="emo">😤</span>انتقام‌جو</label>
-          </div>
-          <div class="emotion-btn">
-            <input type="radio" id="em5" name="وضعیت احساسی" value="بیش از حد اطمینان">
-            <label for="em5"><span class="emo">😎</span>خیلی مطمئن</label>
-          </div>
-          <div class="emotion-btn">
-            <input type="radio" id="em6" name="وضعیت احساسی" value="خسته و بی‌حوصله">
-            <label for="em6"><span class="emo">😴</span>خسته</label>
-          </div>
-          <div class="emotion-btn">
-            <input type="radio" id="em7" name="وضعیت احساسی" value="استرس و نگران">
-            <label for="em7"><span class="emo">😟</span>نگران</label>
-          </div>
-          <div class="emotion-btn">
-            <input type="radio" id="em8" name="وضعیت احساسی" value="خوشحال و مثبت">
-            <label for="em8"><span class="emo">😊</span>خوشحال</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="field" style="margin-bottom:18px;">
-        <label>میزان اطمینان به این معامله</label>
-        <div class="range-wrap">
-          <div class="range-val mono" id="conf-val">۵۰٪</div>
-          <input type="range" id="conf-range" name="میزان اطمینان" min="0" max="100" value="50" step="5">
-          <div class="range-labels"><span>اصلاً مطمئن نیستم</span><span>صد درصد مطمئنم</span></div>
-        </div>
-      </div>
-
-      <div class="divider">تحلیل معامله</div>
-
-      <div class="field" style="margin-bottom:16px;">
-        <label>علت و منطق ورود به معامله <span class="req">*</span></label>
-        <textarea name="علت ورود" placeholder="چرا این معامله را باز کردی؟ چه سیگنال یا ستاپی دیدی؟ ساختار بازار چطور بود؟" required style="min-height:110px;"></textarea>
-      </div>
-
-      <div class="field" style="margin-bottom:16px;">
-        <label>سناریوی معاملاتی (Plan)</label>
-        <textarea name="سناریوی معاملاتی" placeholder="پلن الف: اگر قیمت به X رسید... | پلن ب: اگر استاپ خورد انتظار دارم..." style="min-height:90px;"></textarea>
+        <label>حد سود <span class="opt">(اختیاری)</span></label>
+        <input type="number" step="any" name="حد سود">
       </div>
 
       <div class="field">
-        <label>نقاط ضعف یا تردیدهای این معامله</label>
-        <textarea name="نقاط ضعف" placeholder="چه چیزی نگرانت می‌کند؟ آیا چیزی در تحلیلت ضعیف است؟"></textarea>
+        <label>دلیل ورود *</label>
+        <textarea name="دلیل ورود" placeholder="چرا وارد معامله شدی؟" required></textarea>
       </div>
 
-      <div class="divider">بعد از بسته شدن معامله</div>
+      <div class="section-label">📎 ارسال لینک</div>
 
-      <div class="field" style="margin-bottom:16px;">
-        <label>نتیجه نهایی معامله</label>
-        <div class="radio-group">
-          <div class="radio-btn">
-            <input type="radio" id="r-win" name="نتیجه معامله" value="✅ سود (Win)">
-            <label for="r-win" style="color:var(--green);">✓ سود</label>
-          </div>
-          <div class="radio-btn">
-            <input type="radio" id="r-loss" name="نتیجه معامله" value="❌ ضرر (Loss)">
-            <label for="r-loss" style="color:var(--red);">✕ ضرر</label>
-          </div>
-          <div class="radio-btn">
-            <input type="radio" id="r-be" name="نتیجه معامله" value="⚖️ سربه‌سر (Break Even)">
-            <label for="r-be">＝ سربه‌سر</label>
-          </div>
-          <div class="radio-btn">
-            <input type="radio" id="r-open" name="نتیجه معامله" value="🟡 هنوز باز">
-            <label for="r-open">● هنوز باز</label>
-          </div>
+      <div class="link-box">
+        <div class="link-row">
+          <input type="url" id="linkInput" placeholder="https://www.tradingview.com/x/...">
+          <button type="button" class="submit" id="addLinkBtn" style="width:auto;margin:0;padding:12px 18px;font-size:13.5px;">افزودن</button>
         </div>
+        <div class="link-hint">لینک چارت، تحلیل یا هر مرجع مرتبط با این معامله را اینجا اضافه کن.</div>
+        <div class="chip-list" id="linkList"></div>
       </div>
 
-      <div class="row row-3">
-        <div class="field">
-          <label>سود/ضرر نهایی ($)</label>
-          <input type="text" name="سود یا ضرر دلاری" placeholder="+150 یا -80">
-        </div>
-        <div class="field">
-          <label>سود/ضرر به R</label>
-          <input type="text" name="سود یا ضرر به R" placeholder="+2R یا -1R">
-        </div>
-        <div class="field">
-          <label>ساعت خروج</label>
-          <input type="time" name="ساعت خروج">
-        </div>
-      </div>
+      <input type="hidden" name="لینک‌های ضمیمه" id="linksField">
 
-      <div class="field" style="margin: 16px 0;">
-        <label>اشتباهات، درس‌ها و آموخته‌ها</label>
-        <textarea name="درس‌ها و آموخته‌ها" placeholder="چه اشتباهی کردی؟ پلنت را رعایت کردی؟ احساساتت روی تصمیمت تاثیر گذاشت؟ دفعه بعد چه می‌کنی؟" style="min-height:110px;"></textarea>
-      </div>
+      <div class="section-label">تصویر چارت</div>
 
       <div class="field">
-        <label>امتیاز کیفی خودت به این معامله</label>
-        <div class="range-wrap">
-          <div class="range-val mono" id="score-val">۵/۱۰</div>
-          <input type="range" id="score-range" name="امتیاز کیفی معامله" min="1" max="10" value="5">
-          <div class="range-labels"><span>۱ — خیلی بد</span><span>۱۰ — عالی</span></div>
+        <label class="file-drop">
+          <input type="file" id="chartImage" accept="image/png,image/jpeg,image/webp">
+          <div class="file-drop-label">🖼️ <span>برای آپلود تصویر چارت کلیک کن</span></div>
+        </label>
+        <div class="status" id="uploadStatus"></div>
+        <div class="preview" id="previewBox">
+          <img id="previewImage" alt="پیش‌نمایش">
         </div>
       </div>
-    </div>
+
+      <input type="hidden" name="لینک چارت" id="chartUrl">
+      <input type="hidden" name="_subject" value="📒 معامله جدید">
+
+      <button class="submit" id="submitBtn" type="submit">ثبت و ارسال</button>
+
+    </form>
+
+    <div class="success" id="successBox">✅ معامله با موفقیت ثبت شد.</div>
+    <div class="error" id="errorBox"></div>
   </div>
 
-  <!-- ───── ۵ ───── -->
-  <div class="entry">
-    <div class="entry-head">
-      <div class="entry-no mono">۵</div>
-      <div class="entry-title">آپلود تصویر چارت</div>
-    </div>
-    <div class="entry-desc">تصویر قبل یا بعد از معامله را آپلود کن</div>
-    <div class="entry-body">
-      <div class="upload-zone" id="upload-zone">
-        <input type="file" name="عکس چارت" id="chart-upload" accept="image/*" onchange="previewImage(event)">
-        <div class="upload-icon">📎</div>
-        <div class="upload-title">عکس چارت را اینجا بینداز یا کلیک کن</div>
-        <div class="upload-sub">PNG, JPG, WEBP — حداکثر ۱۰ مگابایت</div>
-        <div id="file-name" class="mono"></div>
-      </div>
-      <div id="upload-preview">
-        <img id="preview-img" src="" alt="پیش‌نمایش چارت">
-      </div>
-    </div>
-  </div>
-
-  <div class="submit-wrap">
-    <button type="submit" class="btn-submit">ثبت سطر در دفتر و ارسال به ایمیل</button>
-  </div>
-
-  <input type="hidden" name="_replyto" value="aliamjadian.3330@gmail.com">
-  <input type="hidden" name="_subject" value="📒 سطر جدید دفتر معاملات">
-  <input type="hidden" name="_next" value="">
-
-</form>
-
-<div id="success-msg">
-  <div class="stamp">ثبت شد ✓</div>
-  <p>سطر این معامله در دفترت ثبت شد و به ایمیل aliamjadian.3330@gmail.com ارسال شد.<br>یادت باشه — هر سطر، یک قدم به جلوست.</p>
 </div>
 
-<div class="foot-note">TradeLog · دفتر معاملات شخصی</div>
-
-</div><!-- /main -->
-
 <script>
-  const checks = document.querySelectorAll('#checklist input[type=checkbox]');
-  const persianNums = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
-  function toPersian(n) { return String(n).split('').map(d => persianNums[+d] !== undefined ? persianNums[+d] : d).join(''); }
-  function updateCount() {
-    const n = Array.from(checks).filter(c => c.checked).length;
-    document.getElementById('check-count').textContent = toPersian(n);
+  const CLOUD_NAME = "YOUR_CLOUD_NAME";
+  const UPLOAD_PRESET = "YOUR_UPLOAD_PRESET";
+
+  const form = document.getElementById("tradeForm");
+  const fileInput = document.getElementById("chartImage");
+  const chartUrl = document.getElementById("chartUrl");
+
+  const submitBtn = document.getElementById("submitBtn");
+  const uploadStatus = document.getElementById("uploadStatus");
+
+  const previewBox = document.getElementById("previewBox");
+  const previewImage = document.getElementById("previewImage");
+
+  const successBox = document.getElementById("successBox");
+  const errorBox = document.getElementById("errorBox");
+
+  // --- new: link list logic ---
+  const linkInput = document.getElementById("linkInput");
+  const addLinkBtn = document.getElementById("addLinkBtn");
+  const linkList = document.getElementById("linkList");
+  const linksField = document.getElementById("linksField");
+
+  let links = [];
+
+  function renderLinks() {
+    linkList.innerHTML = "";
+    links.forEach((url, i) => {
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      const short = url.length > 38 ? url.slice(0, 35) + "…" : url;
+      chip.innerHTML = `<span>${short}</span>`;
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.textContent = "×";
+      removeBtn.addEventListener("click", () => {
+        links.splice(i, 1);
+        renderLinks();
+      });
+      chip.appendChild(removeBtn);
+      linkList.appendChild(chip);
+    });
+    linksField.value = links.join(", ");
   }
-  checks.forEach(c => c.addEventListener('change', updateCount));
 
-  document.getElementById('conf-range').addEventListener('input', function() {
-    document.getElementById('conf-val').textContent = toPersian(this.value) + '٪';
+  function addLink() {
+    const value = linkInput.value.trim();
+    if (!value) return;
+    try {
+      new URL(value);
+    } catch {
+      alert("لینک معتبر وارد کن.");
+      return;
+    }
+    links.push(value);
+    linkInput.value = "";
+    renderLinks();
+  }
+
+  addLinkBtn.addEventListener("click", addLink);
+  linkInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addLink();
+    }
   });
 
-  document.getElementById('score-range').addEventListener('input', function() {
-    document.getElementById('score-val').textContent = toPersian(this.value) + '/۱۰';
-  });
-
-  function previewImage(e) {
-    const file = e.target.files[0];
+  // --- existing: image upload preview ---
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
     if (!file) return;
-    document.getElementById('file-name').textContent = '✓ ' + file.name;
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("حداکثر حجم فایل ۱۰ مگابایت است.");
+      fileInput.value = "";
+      return;
+    }
+
     const reader = new FileReader();
-    reader.onload = function(ev) {
-      document.getElementById('preview-img').src = ev.target.result;
-      document.getElementById('upload-preview').style.display = 'block';
+    reader.onload = function(event) {
+      previewImage.src = event.target.result;
+      previewBox.style.display = "block";
     };
     reader.readAsDataURL(file);
-  }
+  });
 
-  // ارسال واقعی با fetch + نمایش خطای دقیق برای عیب‌یابی
-  const form = document.getElementById('journal-form');
-  form.addEventListener('submit', async function(e) {
+  form.addEventListener("submit", async function(e) {
     e.preventDefault();
-    const btn = this.querySelector('.btn-submit');
-    const originalText = btn.textContent;
-    btn.textContent = 'در حال ارسال...';
-    btn.disabled = true;
-    const data = new FormData(this);
+
+    successBox.style.display = "none";
+    errorBox.style.display = "none";
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "در حال ارسال...";
+
     try {
-      const res = await fetch(this.action, {
-        method: 'POST',
-        body: data,
-        headers: { 'Accept': 'application/json' }
-      });
-      if (res.ok) {
-        this.style.display = 'none';
-        document.getElementById('success-msg').style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        let detail = '';
-        try {
-          const j = await res.json();
-          if (j && j.errors) detail = j.errors.map(er => er.message).join(' | ');
-          else if (j && j.error) detail = j.error;
-        } catch (_) {}
-        btn.textContent = 'خطا (' + res.status + ') — برای جزئیات Console مرورگر را ببین';
-        btn.disabled = false;
-        console.error('Formspree error', res.status, detail);
-        alert('خطای ارسال (کد ' + res.status + ')' + (detail ? ':\n' + detail : '') + '\n\nاگر این فایل را به‌صورت لوکال (file://) باز کرده‌ای، ممکن است Formspree آن را مسدود کند. آن را روی یک هاست واقعی (مثل GitHub Pages) بگذار و دوباره امتحان کن.');
-        setTimeout(() => { btn.textContent = originalText; }, 4000);
+      const file = fileInput.files[0];
+
+      if (file) {
+        uploadStatus.textContent = "در حال آپلود تصویر...";
+
+        const imageData = new FormData();
+        imageData.append("file", file);
+        imageData.append("upload_preset", UPLOAD_PRESET);
+
+        const uploadResponse = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          { method: "POST", body: imageData }
+        );
+
+        const uploadResult = await uploadResponse.json();
+
+        if (!uploadResponse.ok) {
+          throw new Error(uploadResult.error?.message || "خطا در آپلود تصویر");
+        }
+
+        chartUrl.value = uploadResult.secure_url;
+        uploadStatus.textContent = "✅ تصویر آپلود شد.";
       }
-    } catch (err) {
-      btn.textContent = 'خطا در اتصال';
-      btn.disabled = false;
-      console.error('Network error', err);
-      alert('اتصال به سرور Formspree برقرار نشد. اگر فایل را به‌صورت لوکال (دابل‌کلیک، آدرس file://) باز کرده‌ای، مرورگر اجازه این درخواست را نمی‌دهد. فایل را روی یک هاست واقعی (GitHub Pages, Netlify و ...) آپلود کن و از آن آدرس باز کن.');
-      setTimeout(() => { btn.textContent = originalText; }, 4000);
+
+      const formData = new FormData(form);
+
+      const response = await fetch("https://formspree.io/f/mqeovdwz", {
+        method: "POST",
+        body: formData,
+        headers: { "Accept": "application/json" }
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.errors?.map(item => item.message).join(" | ") || "خطا در ارسال فرم"
+        );
+      }
+
+      form.reset();
+      previewBox.style.display = "none";
+      chartUrl.value = "";
+      uploadStatus.textContent = "";
+      links = [];
+      renderLinks();
+
+      successBox.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (error) {
+      errorBox.textContent = error.message;
+      errorBox.style.display = "block";
+      console.error(error);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "ثبت و ارسال";
     }
   });
 </script>
