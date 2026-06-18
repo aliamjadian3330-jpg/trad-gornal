@@ -1,220 +1,206 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>دفتر معاملات حرفه‌ای</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دفتر معاملات</title>
 
-<style>
-  body {
-    margin: 0;
-    font-family: Tahoma;
-    background: #0b1220;
-    color: #fff;
-    padding: 20px;
-  }
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background: #f5f1e8;
+      color: #2b2620;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 24px;
+    }
 
-  .box {
-    max-width: 750px;
-    margin: auto;
-    background: rgba(255,255,255,0.05);
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
 
-  h1 { text-align:center; }
+    .field {
+      margin-bottom: 15px;
+    }
 
-  input, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 6px;
-    margin-bottom: 14px;
-    border-radius: 10px;
-    border: 1px solid #333;
-    background: #0f172a;
-    color: #fff;
-  }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+    }
 
-  button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    background: #22c55e;
-    font-weight: bold;
-    cursor: pointer;
-  }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbbd9d;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
 
-  button:disabled {
-    opacity: 0.5;
-  }
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
 
-  .preview img {
-    width: 100%;
-    margin-top: 10px;
-    border-radius: 10px;
-    display: none;
-  }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #2b2620;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-  .msg {
-    margin-top: 10px;
-    font-size: 14px;
-  }
+    button:disabled {
+      opacity: 0.6;
+    }
 
-  .ok { color: #22c55e; }
-  .err { color: #ef4444; }
-</style>
+    #success {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      background: #dff5e5;
+      color: #1f6a38;
+      border-radius: 8px;
+    }
+
+    #error {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      background: #fde2e2;
+      color: #a12828;
+      border-radius: 8px;
+    }
+
+    #preview {
+      display: none;
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="box">
-  <h1>📒 دفتر معاملات</h1>
+<h1>📒 دفتر معاملات</h1>
 
-  <form id="form">
+<form id="tradeForm">
 
-    <label>تاریخ</label>
+  <div class="field">
+    <label>تاریخ معامله</label>
     <input type="date" name="date" required>
+  </div>
 
+  <div class="field">
     <label>نماد</label>
-    <input type="text" name="symbol" required>
+    <input type="text" name="symbol" placeholder="BTCUSDT" required>
+  </div>
 
-    <label>جهت</label>
-    <input type="text" name="side" required>
+  <div class="field">
+    <label>جهت معامله</label>
+    <select name="direction" required>
+      <option value="">انتخاب کنید</option>
+      <option value="buy">خرید</option>
+      <option value="sell">فروش</option>
+    </select>
+  </div>
 
-    <label>ورود</label>
-    <input type="number" step="any" name="entry" required>
+  <div class="field">
+    <label>نقطه ورود</label>
+    <input type="number" name="entry" step="any" required>
+  </div>
 
+  <div class="field">
     <label>حد ضرر</label>
-    <input type="number" step="any" name="sl" required>
+    <input type="number" name="stoploss" step="any" required>
+  </div>
 
-    <label>توضیحات</label>
+  <div class="field">
+    <label>حد سود</label>
+    <input type="number" name="takeprofit" step="any">
+  </div>
+
+  <div class="field">
+    <label>دلیل ورود</label>
     <textarea name="reason" required></textarea>
+  </div>
 
-    <label>تصویر چارت</label>
-    <input type="file" id="file" accept="image/*">
+  <div class="field">
+    <label>آپلود تصویر معامله</label>
+    <input type="file" name="image" accept="image/*">
+    <img id="preview">
+  </div>
 
-    <div class="preview">
-      <img id="img">
-    </div>
+  <input type="hidden" name="_subject" value="New Trade">
 
-    <div class="msg" id="status"></div>
+  <button type="submit" id="btn">ارسال</button>
 
-    <input type="hidden" name="chart" id="chartUrl">
+</form>
 
-    <button id="btn">ثبت معامله</button>
-
-    <div class="msg ok" id="ok"></div>
-    <div class="msg err" id="err"></div>
-
-  </form>
-</div>
+<div id="success">✅ معامله ثبت شد</div>
+<div id="error"></div>
 
 <script>
-const CLOUD_NAME = "YOUR_CLOUD_NAME";
-const UPLOAD_PRESET = "YOUR_UPLOAD_PRESET";
-
-const form = document.getElementById("form");
-const file = document.getElementById("file");
-const img = document.getElementById("img");
-const chartUrl = document.getElementById("chartUrl");
-
-const status = document.getElementById("status");
+const form = document.getElementById("tradeForm");
 const btn = document.getElementById("btn");
+const success = document.getElementById("success");
+const error = document.getElementById("error");
+const fileInput = document.querySelector('input[type="file"]');
+const preview = document.getElementById("preview");
 
-const ok = document.getElementById("ok");
-const err = document.getElementById("err");
-
-let uploadedUrl = "";
-
-file.addEventListener("change", () => {
-  const f = file.files[0];
-  if (!f) return;
-
-  if (f.size > 5 * 1024 * 1024) {
-    alert("حداکثر 5MB");
-    file.value = "";
-    return;
+// preview image
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
   }
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    img.src = e.target.result;
-    img.style.display = "block";
-  };
-  reader.readAsDataURL(f);
 });
-
-async function uploadImage(file) {
-  const fd = new FormData();
-  fd.append("file", file);
-  fd.append("upload_preset", UPLOAD_PRESET);
-
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-    { method: "POST", body: fd }
-  );
-
-  const data = await res.json();
-
-  if (!res.ok || !data.secure_url) {
-    throw new Error(data.error?.message || "خطا در آپلود تصویر");
-  }
-
-  return data.secure_url;
-}
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  ok.textContent = "";
-  err.textContent = "";
-
   btn.disabled = true;
   btn.textContent = "در حال ارسال...";
 
+  success.style.display = "none";
+  error.style.display = "none";
+
+  const formData = new FormData(form);
+
   try {
-    const f = file.files[0];
-
-    // 1) آپلود تصویر (اگر وجود داشت)
-    if (f && !uploadedUrl) {
-      status.textContent = "در حال آپلود تصویر...";
-
-      uploadedUrl = await uploadImage(f);
-
-      chartUrl.value = uploadedUrl;
-
-      status.textContent = "✅ تصویر آپلود شد";
-    }
-
-    // 2) ارسال فرم
     const res = await fetch("https://formspree.io/f/mqeovdwz", {
       method: "POST",
-      body: new FormData(form),
-      headers: { Accept: "application/json" }
+      body: formData,
+      headers: {
+        Accept: "application/json"
+      }
     });
 
-    const data = await res.json().catch(() => ({}));
+    const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data?.error || "خطا در ارسال فرم");
+    if (res.ok) {
+      form.reset();
+      preview.style.display = "none";
+      success.style.display = "block";
+    } else {
+      error.style.display = "block";
+      error.textContent = data.errors?.[0]?.message || "خطا در ارسال";
     }
 
-    ok.textContent = "✅ معامله با موفقیت ثبت شد";
-
-    form.reset();
-    img.style.display = "none";
-    status.textContent = "";
-    uploadedUrl = "";
-
-  } catch (e) {
-    console.error(e);
-    err.textContent = "❌ " + e.message;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "ثبت معامله";
+  } catch {
+    error.style.display = "block";
+    error.textContent = "مشکل در اتصال";
   }
+
+  btn.disabled = false;
+  btn.textContent = "ارسال";
 });
 </script>
 
